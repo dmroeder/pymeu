@@ -30,7 +30,7 @@ class Driver:
         if PLC_DRIVER == "pycomm3":
             self.cip.close()
 
-    def generic_message(self, service, class_code, instance, request_data, connected, route_path):
+    def generic_message(self, service, class_code, instance, request_data=b'', connected=False, route_path=None):
         if PLC_DRIVER == "pylogix":
             ret = self.cip.Message(service, class_code, instance, None, request_data)
             if ret.Status == "Success":
