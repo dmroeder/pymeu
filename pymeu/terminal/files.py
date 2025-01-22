@@ -1,10 +1,10 @@
 
-import pycomm3
 import struct
 
 from enum import Enum
 from warnings import warn
 
+from .. import comms
 from .. import messages
 from .. import types
 
@@ -35,12 +35,12 @@ class TransferType(Enum):
     DOWNLOAD = int.from_bytes(b'\x01', byteorder='big')
     UPLOAD = int.from_bytes(b'\x00', byteorder='big')
 
-def create_exchange_download(cip: pycomm3.CIPDriver, file: types.MEFile, remote_path: str) -> int:
+def create_exchange_download(cip: comms.Driver, file: types.MEFile, remote_path: str) -> int:
     """
     Creates a file exchange for downloading from the local device to the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
         file (MEFile): Identifying metadata for the file to be downloaded.
         remote_path (str): The remote path on the terminal where the file 
         will be downloaded to.
@@ -94,12 +94,12 @@ def create_exchange_download(cip: pycomm3.CIPDriver, file: types.MEFile, remote_
     if (resp_chunk_size != CHUNK_SIZE): raise Exception(f'Response chunk size {resp_chunk_size} did not match request size {CHUNK_SIZE}')
     return resp_file_instance
 
-def create_exchange_upload(cip: pycomm3.CIPDriver, remote_path: str) -> int:
+def create_exchange_upload(cip: comms.Driver, remote_path: str) -> int:
     """
     Creates a file exchange for uploading from the remote terminal to the local device.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
         remote_path (str): The remote path on the terminal where the file 
         will be uploaded from.
 
@@ -152,10 +152,10 @@ def create_exchange_upload(cip: pycomm3.CIPDriver, remote_path: str) -> int:
     if (resp_chunk_size != CHUNK_SIZE): raise Exception(f'Response chunk size {resp_chunk_size} did not match request size {CHUNK_SIZE}')
     return resp_file_instance
 
-def delete_exchange(cip: pycomm3.CIPDriver, instance: int):
+def delete_exchange(cip: comms.Driver, instance: int):
     return messages.delete_file_exchange(cip, instance)
 
-def download(cip: pycomm3.CIPDriver, instance: int, source_data: bytearray) -> bool:
+def download(cip: comms.Driver, instance: int, source_data: bytearray) -> bool:
     """
     Downloads a file from the local device to the remote terminal.
     The transfer happens by breaking the file down into one or more
@@ -163,7 +163,7 @@ def download(cip: pycomm3.CIPDriver, instance: int, source_data: bytearray) -> b
     on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
         instance (int): The previously created file transfer instance.
         source_data (bytearray): The binary data of the file to be transferred.
 
@@ -224,11 +224,11 @@ def download(cip: pycomm3.CIPDriver, instance: int, source_data: bytearray) -> b
     resp = messages.write_file_chunk(cip, instance, req_data)
     return True
 
-def download_mer(cip: pycomm3.CIPDriver, instance: int, file: str):
+def download_mer(cip: comms.Driver, instance: int, file: str):
     with open(file, 'rb') as source_file:
         return download(cip, instance, bytearray(source_file.read()))
 
-def upload(cip: pycomm3.CIPDriver, instance: int) -> bytearray:
+def upload(cip: comms.Driver, instance: int) -> bytearray:
     """
     Uploads a file from the remote terminal to the local device.
     The transfer happens by breaking the file down into one or more
@@ -236,7 +236,7 @@ def upload(cip: pycomm3.CIPDriver, instance: int) -> bytearray:
     on the local device.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
         instance (int): The previously created file transfer instance.
 
     Returns:
@@ -296,18 +296,18 @@ def upload(cip: pycomm3.CIPDriver, instance: int) -> bytearray:
 
     return resp_binary
 
-def upload_mer(cip: pycomm3.CIPDriver, instance: int, file: types.MEFile):
+def upload_mer(cip: comms.Driver, instance: int, file: types.MEFile):
     resp_binary = upload(cip, instance)
     with open(file.path, 'wb') as dest_file:
         dest_file.write(resp_binary)
 
-def upload_list(cip: pycomm3.CIPDriver, instance: int):
+def upload_list(cip: comms.Driver, instance: int):
     resp_binary = upload(cip, instance)
     resp_str = "".join([chr(b) for b in resp_binary if b != 0])
     resp_list = resp_str.split(':')
     return resp_list
 
-def is_get_unk_valid(cip: pycomm3.CIPDriver) -> bool:
+def is_get_unk_valid(cip: comms.Driver) -> bool:
     # I don't know what any of these three attributes are for yet.
     # It may be checking that the file exchange is available.
     resp = messages.get_attr_unk(cip, b'\x30\x01')
@@ -330,7 +330,7 @@ def is_get_unk_valid(cip: pycomm3.CIPDriver) -> bool:
 
     return True
 
-def is_set_unk_valid(cip: pycomm3.CIPDriver) -> bool:
+def is_set_unk_valid(cip: comms.Driver) -> bool:
     # I don't know what setting this attribute does yet.
     # It may be marking the file exchange as in use.
     #

@@ -1,6 +1,5 @@
-import pycomm3
-
 from enum import Enum
+from . import comms
 
 # Known CIP class codes that aren't previously defined by pycomm3.
 # Further investigation needed.
@@ -12,14 +11,18 @@ class CipClasses(Enum):
 # Known CIP service codes that aren't previously defined by pycomm3.
 # Further investigation needed.
 class CipServices(Enum):
+    GET_ATTRIBUTE_SINGLE = int.from_bytes(b'\0e', byteorder='big')
+    SET_ATTRIBUTE_SINGLE = int.from_bytes(b'\10', byteorder='big')
     EXECUTE = int.from_bytes(b'\x50', byteorder='big')
     READ_REGISTRY = int.from_bytes(b'\x51', byteorder='big')
     WRITE_FILE = int.from_bytes(b'\x52', byteorder='big')
     READ_FILE = int.from_bytes(b'\x53', byteorder='big')
+    DELETE = int.from_bytes(b'\x55', byteorder='big')
+    CREATE = int.from_bytes(b'\x56', byteorder='big')
 
-def create_file_exchange(cip: pycomm3.CIPDriver, data):
+def create_file_exchange(cip: comms.Driver, data):
     return cip.generic_message(
-        service=pycomm3.Services.create,
+        service=CipServices.CREATE.value,
         class_code=CipClasses.FILE.value,
         instance=0x00,
         request_data=data,
@@ -27,16 +30,16 @@ def create_file_exchange(cip: pycomm3.CIPDriver, data):
         route_path=None
     )
 
-def delete_file_exchange(cip: pycomm3.CIPDriver, instance: int):
+def delete_file_exchange(cip: comms.Driver, instance: int):
     return cip.generic_message(
-        service=pycomm3.Services.delete,
+        service=CipServices.DELETE.value,
         class_code=CipClasses.FILE.value,
         instance=instance,
         connected=False,
         route_path=None
     )
 
-def read_file_chunk(cip: pycomm3.CIPDriver, instance: int, data):
+def read_file_chunk(cip: comms.Driver, instance: int, data):
     return cip.generic_message(
         service=CipServices.READ_FILE.value,
         class_code=CipClasses.FILE.value,
@@ -46,7 +49,7 @@ def read_file_chunk(cip: pycomm3.CIPDriver, instance: int, data):
         route_path=None
     )
 
-def read_registry(cip: pycomm3.CIPDriver, data):
+def read_registry(cip: comms.Driver, data):
     return cip.generic_message(
         service=CipServices.READ_REGISTRY.value,
         class_code=CipClasses.REGISTRY.value,
@@ -56,7 +59,7 @@ def read_registry(cip: pycomm3.CIPDriver, data):
         route_path=None
     )
 
-def run_function(cip: pycomm3.CIPDriver, data):
+def run_function(cip: comms.Driver, data):
     return cip.generic_message(
         service=CipServices.EXECUTE.value,
         class_code=CipClasses.FUNCTION.value,
@@ -66,7 +69,7 @@ def run_function(cip: pycomm3.CIPDriver, data):
         route_path=None
     )
 
-def write_file_chunk(cip: pycomm3.CIPDriver, instance: int, data):
+def write_file_chunk(cip: comms.Driver, instance: int, data):
     return cip.generic_message(
         service=CipServices.WRITE_FILE.value,
         class_code=CipClasses.FILE.value,
@@ -76,9 +79,9 @@ def write_file_chunk(cip: pycomm3.CIPDriver, instance: int, data):
         route_path=None
     )
 
-def get_attr_unk(cip: pycomm3.CIPDriver, data):
+def get_attr_unk(cip: comms.Driver, data):
     return cip.generic_message(
-        service=pycomm3.Services.get_attribute_single,
+        service=CipServices.GET_ATTRIBUTE_SINGLE.value,
         class_code=CipClasses.FILE.value,
         instance=0x00,
         request_data=data,
@@ -86,9 +89,9 @@ def get_attr_unk(cip: pycomm3.CIPDriver, data):
         route_path=None
     )
 
-def set_attr_unk(cip: pycomm3.CIPDriver, data):
+def set_attr_unk(cip: comms.Driver, data):
     return cip.generic_message(
-        service=pycomm3.Services.set_attribute_single,
+        service=CipServices.SET_ATTRIBUTE_SINGLE,
         class_code=CipClasses.FILE.value,
         instance=0x01,
         request_data=data,

@@ -1,6 +1,5 @@
-import pycomm3
-
 from enum import StrEnum
+from .. import comms
 from .. import messages
 
 # Known registry keys on the terminal that should be whitelisted for read access through RemoteHelper.
@@ -19,12 +18,12 @@ class RegKeys(StrEnum):
     ME_STARTUP_REPLACE_COMMS = 'HKEY_LOCAL_MACHINE\SOFTWARE\Rockwell Software\RSViewME\Startup Options\ReplaceCommSettings' # ex: 0
     ME_STARTUP_OPTIONS = 'HKEY_LOCAL_MACHINE\SOFTWARE\Rockwell Software\RSViewME\Startup Options\StartupOptionsConfig'      # ex: 1
 
-def get_value(cip: pycomm3.CIPDriver, key: str) -> str:
+def get_value(cip: comms.Driver, key: str) -> str:
     """
     Gets a registry key's value from the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
         key (str): The registry key to read.
 
     Returns:
@@ -66,96 +65,96 @@ def get_value(cip: pycomm3.CIPDriver, key: str) -> str:
     resp_value = str(resp.value[8:].decode('utf-8').strip('\x00'))
     return resp_value
 
-def get_me_version(cip: pycomm3.CIPDriver) -> str:
+def get_me_version(cip: comms.Driver) -> str:
     """
     Gets the ME Version on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         str: ME Version string
     """
     return get_value(cip, [RegKeys.ME_VERSION])
 
-def get_product_code(cip: pycomm3.CIPDriver) -> int:
+def get_product_code(cip: comms.Driver) -> int:
     """
     Gets the product code on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         int: Product Code value
     """
     return int(get_value(cip, [RegKeys.CIP_PRODUCT_CODE]))
 
-def get_product_name(cip: pycomm3.CIPDriver) -> str:
+def get_product_name(cip: comms.Driver) -> str:
     """
     Gets the product name on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         str: Product Name value
     """
     return str(get_value(cip, [RegKeys.CIP_PRODUCT_NAME]))
 
-def get_product_type(cip: pycomm3.CIPDriver) -> int:
+def get_product_type(cip: comms.Driver) -> int:
     """
     Gets the product type on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         int: Product Type value
     """
     return int(get_value(cip, [RegKeys.CIP_PRODUCT_TYPE]))
 
-def get_startup_delete_logs(cip: pycomm3.CIPDriver) -> bool:
+def get_startup_delete_logs(cip: comms.Driver) -> bool:
     """
     Gets the startup setting for Delete Logs on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         bool: Don't (FALSE) or do (TRUE) delete log files at startup.
     """
     return bool(int(get_value(cip, [RegKeys.ME_STARTUP_DELETE_LOGS])))
 
-def get_startup_load_current(cip: pycomm3.CIPDriver) -> bool:
+def get_startup_load_current(cip: comms.Driver) -> bool:
     """
     Gets the startup setting for Load Current Application on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         bool: Don't (FALSE) or do (TRUE) load the *.MER at startup.
     """
     return bool(int(get_value(cip, [RegKeys.ME_STARTUP_LOAD_CURRENT])))
 
-def get_startup_mer(cip: pycomm3.CIPDriver) -> str:
+def get_startup_mer(cip: comms.Driver) -> str:
     """
     Gets the *.MER file to load at startup on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         str: Path to *.MER file.
     """
     return get_value(cip, [RegKeys.ME_STARTUP_APP])
 
-def get_startup_options(cip: pycomm3.CIPDriver) -> int:
+def get_startup_options(cip: comms.Driver) -> int:
     """
     Gets the setting for On Startup on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         int: At startup, 0 = Go to ME Station, 1 = Run Current Application,
@@ -163,12 +162,12 @@ def get_startup_options(cip: pycomm3.CIPDriver) -> int:
     """
     return int(get_value(cip, [RegKeys.ME_STARTUP_OPTIONS]))
 
-def get_startup_replace_comms(cip: pycomm3.CIPDriver) -> bool:
+def get_startup_replace_comms(cip: comms.Driver) -> bool:
     """
     Gets the startup setting for Replace Communications on the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         bool: Don't (FALSE) or do (TRUE) replace terminal communications with *.MER
@@ -176,12 +175,12 @@ def get_startup_replace_comms(cip: pycomm3.CIPDriver) -> bool:
     """
     return bool(int(get_value(cip, [RegKeys.ME_STARTUP_REPLACE_COMMS])))
 
-def get_version_major(cip: pycomm3.CIPDriver) -> int:
+def get_version_major(cip: comms.Driver) -> int:
     """
     Gets the CIP Major Version from the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         int: The major version.
@@ -192,12 +191,12 @@ def get_version_major(cip: pycomm3.CIPDriver) -> int:
     """
     return int(get_value(cip, [RegKeys.CIP_VERSION_MAJOR]))
 
-def get_version_minor(cip: pycomm3.CIPDriver) -> int:
+def get_version_minor(cip: comms.Driver) -> int:
     """
     Gets the CIP Minor Version from the remote terminal.
 
     Args:
-        cip (pycomm3.CIPDriver): CIPDriver to communicate with the terminal
+        cip (comms.Driver): CIPDriver to communicate with the terminal
 
     Returns:
         int: The minor version.

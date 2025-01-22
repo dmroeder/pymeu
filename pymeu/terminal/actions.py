@@ -1,13 +1,13 @@
 import os
-import pycomm3
 
 from . import files
 from . import helper
 from . import paths
 from . import registry
+from .. import comms
 from .. import types
 
-def create_log(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo, print_log: bool, redact_log: bool):
+def create_log(cip: comms.Driver, device: types.MEDeviceInfo, print_log: bool, redact_log: bool):
     if print_log: print(f'Terminal product type: {device.product_type}.')
     if print_log: print(f'Terminal product code: {device.product_code}.')
     if print_log: print(f'Terminal product name: {device.product_name}.')
@@ -56,7 +56,7 @@ def create_log(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo, print_log: bo
     device.log.append(line)
     if print_log: print(f'{line}')
 
-def download_mer_file(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo, file:types.MEFile, run_at_startup: bool, replace_comms: bool, delete_logs: bool) -> bool:
+def download_mer_file(cip: comms.Driver, device: types.MEDeviceInfo, file:types.MEFile, run_at_startup: bool, replace_comms: bool, delete_logs: bool) -> bool:
     # Create runtime folder
     #
     # TODO: Can we check if this already exists and skip?
@@ -93,7 +93,7 @@ def download_mer_file(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo, file:t
         reboot(cip, device)
     return True
 
-def upload_mer_file(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo, file: types.MEFile, rem_file: types.MEFile) -> bool:
+def upload_mer_file(cip: comms.Driver, device: types.MEDeviceInfo, file: types.MEFile, rem_file: types.MEFile) -> bool:
     # Verify file exists on terminal
     if not(helper.get_file_exists(cip, rem_file)): raise Exception(f'File {rem_file.name} does not exist on terminal.')
 
@@ -111,7 +111,7 @@ def upload_mer_file(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo, file: ty
 
     return True
 
-def upload_med_list(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo):
+def upload_med_list(cip: comms.Driver, device: types.MEDeviceInfo):
     # Create list on the terminal
     helper.create_med_list(cip)
 
@@ -133,7 +133,7 @@ def upload_med_list(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo):
 
     return file_list
 
-def upload_mer_list(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo):
+def upload_mer_list(cip: comms.Driver, device: types.MEDeviceInfo):
     # Create *.MER list
     helper.create_mer_list(cip)
 
@@ -156,8 +156,8 @@ def upload_mer_list(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo):
 
     return file_list
 
-def reboot(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo):
-    cip1 = pycomm3.CIPDriver(cip._cip_path)
+def reboot(cip: comms.Driver, device: types.MEDeviceInfo):
+    cip1 = comms.Driver(cip._cip_path)
     cip1._cfg['socket_timeout'] = 0.25
     cip1.open()
     try:
@@ -197,7 +197,7 @@ def reboot(cip: pycomm3.CIPDriver, device: types.MEDeviceInfo):
         # Execute reboot
         device.log.append(f'Rebooting terminal.')
         helper.reboot(cip1)
-    except pycomm3.PycommError as e:
+    except Exception as e:
         # Unlike most CIP messages, this one is expected to
         # create an exception.  When it is received by the terminal,
         # the device reboots and breaks the socket.
