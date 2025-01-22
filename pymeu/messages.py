@@ -11,14 +11,14 @@ class CipClasses(Enum):
 # Known CIP service codes that aren't previously defined by pycomm3.
 # Further investigation needed.
 class CipServices(Enum):
+    CREATE = int.from_bytes(b'\x08', byteorder='big')
+    DELETE = int.from_bytes(b'\x09', byteorder='big')
     GET_ATTRIBUTE_SINGLE = int.from_bytes(b'\0e', byteorder='big')
     SET_ATTRIBUTE_SINGLE = int.from_bytes(b'\10', byteorder='big')
     EXECUTE = int.from_bytes(b'\x50', byteorder='big')
     READ_REGISTRY = int.from_bytes(b'\x51', byteorder='big')
     WRITE_FILE = int.from_bytes(b'\x52', byteorder='big')
     READ_FILE = int.from_bytes(b'\x53', byteorder='big')
-    DELETE = int.from_bytes(b'\x55', byteorder='big')
-    CREATE = int.from_bytes(b'\x56', byteorder='big')
 
 def create_file_exchange(cip: comms.Driver, data):
     return cip.generic_message(
