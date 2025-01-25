@@ -47,7 +47,31 @@ class Driver:
                                                 route_path=route_path)
 
         return response
+
+    @property
+    def timeout(self):
+        if PLC_DRIVER == "pycomm3":
+            return self.cip._cfg['socket_timeout']
+        if PLC_DRIVER == "pylogix":
+            return self.cip.SocketTimeout
+
+    @timeout.setter
+    def timeout(self, new_value):
+        if PLC_DRIVER == "pycomm3":
+            self.cip._cfg['socket_timeout'] = new_value
+
+        if PLC_DRIVER == "pylogix":
+            self.cip.SocketTimeout = new_value
     
+
+    def open(self):
+        if PLC_DRIVER == "pycomm3":
+            self.cip.open()
+
+    def close(self):
+        if PLC_DRIVER == "pycomm3":
+            self.cip.close()
+
 
 class Response(object):
 

@@ -158,7 +158,7 @@ def upload_mer_list(cip: comms.Driver, device: types.MEDeviceInfo):
 
 def reboot(cip: comms.Driver, device: types.MEDeviceInfo):
     cip1 = comms.Driver(cip._cip_path)
-    cip1._cfg['socket_timeout'] = 0.25
+    cip1.timeout = 0.25
     cip1.open()
     try:
         # Execute reboot
