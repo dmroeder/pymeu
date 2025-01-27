@@ -13,8 +13,8 @@ class CipClasses(Enum):
 class CipServices(Enum):
     CREATE = int.from_bytes(b'\x08', byteorder='big')
     DELETE = int.from_bytes(b'\x09', byteorder='big')
-    GET_ATTRIBUTE_SINGLE = int.from_bytes(b'\0e', byteorder='big')
-    SET_ATTRIBUTE_SINGLE = int.from_bytes(b'\10', byteorder='big')
+    GET_ATTRIBUTE_SINGLE = int.from_bytes(b'\x0e', byteorder='big')
+    SET_ATTRIBUTE_SINGLE = int.from_bytes(b'\x10', byteorder='big')
     EXECUTE = int.from_bytes(b'\x50', byteorder='big')
     READ_REGISTRY = int.from_bytes(b'\x51', byteorder='big')
     WRITE_FILE = int.from_bytes(b'\x52', byteorder='big')
@@ -91,7 +91,7 @@ def get_attr_unk(cip: comms.Driver, data):
 
 def set_attr_unk(cip: comms.Driver, data):
     return cip.generic_message(
-        service=CipServices.SET_ATTRIBUTE_SINGLE,
+        service=CipServices.SET_ATTRIBUTE_SINGLE.value,
         class_code=CipClasses.FILE.value,
         instance=0x01,
         request_data=data,
