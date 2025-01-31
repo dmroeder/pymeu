@@ -5,31 +5,33 @@ class Driver:
     def __init__(self, ip_address=None, driver=None):
 
         self._cip_path = ip_address
-        self.plc_driver = driver
 
-        if self.plc_driver is None:
-            # no driver specified, try both
-            try:
-                import pycomm3
-                self.plc_driver = "pycomm3"
-            except ImportError:
-                try:
-                    import pylogix
-                    self.plc_driver = "pylogix"
-                except ImportError:
-                    raise ImportError("You need to install pylogix or pycomm3")
-        elif self.plc_driver == "pycomm3":
-            try:
-                import pycomm3
-            except:
-                raise ImportError("pycomm3 driver was specified but is not installed on the system")
-        elif self.plc_driver == "pylogix":
-            try:
-                import pylogix
-            except:
-                raise ImportError("pylogix driver was specified but is not installed on the system")
+        # see which drivers are installed on the system
+        available_drivers = []
+        try:
+            import pycomm3
+            available_drivers.append("pycomm3")
+        except:
+            pass
+
+        try:
+            import pylogix
+            available_drivers.append("pylogix")
+        except:
+            pass
+
+        if not available_drivers:
+            raise ImportError("You need to install pycomm3 or pylogix")
+
+        # select the driver the user requested
+        if driver:
+            if driver in available_drivers:
+                self.plc_driver = driver
+            else:
+                raise ImportError(f"{driver} is not installed on the system")
         else:
-            raise ValueError("{} was specified for the driver, only pylogix and pycomm3 are supported".format(self.plc_driver))
+            # no driver requested, pick the first one
+            self.plc_driver = available_drivers[0]
 
         if self.plc_driver == "pylogix":
             self.cip = pylogix.PLC(self._cip_path)
