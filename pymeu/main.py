@@ -22,6 +22,7 @@ class MEUtility(object):
         """
         self.comms_path = comms_path
         self.ignore_terminal_valid = kwargs.get('ignore_terminal_valid', False)
+        self.driver = kwargs.get('driver', None)
 
     def download(self, file_path: str, **kwargs) -> types.MEResponse:
         """
@@ -52,7 +53,7 @@ class MEUtility(object):
         self.remote_file_name = kwargs.get('remote_file_name', os.path.basename(file_path))
         self.run_at_startup = kwargs.get('run_at_startup', True)
 
-        with comms.Driver(self.comms_path) as cip:
+        with comms.Driver(self.comms_path, self.driver) as cip:
             file = types.MEFile(self.remote_file_name, self.overwrite, False, file_path)
 
             # Validate device at this communications path is a terminal of known version.
@@ -89,7 +90,7 @@ class MEUtility(object):
         """
         self.print_log = kwargs.get('print_log', False)
         self.redact_log = kwargs.get('redact_log', False)
-        with comms.Driver(self.comms_path) as cip:
+        with comms.Driver(self.comms_path, self.driver) as cip:
             self.device = terminal.validation.get_terminal_info(cip)
             if not(terminal.validation.is_terminal_valid(self.device)):
                 if self.ignore_terminal_valid:
@@ -105,7 +106,7 @@ class MEUtility(object):
         """
         Reboots the remote terminal now.
         """
-        with comms.Driver(self.comms_path) as cip:
+        with comms.Driver(self.comms_path, self.driver) as cip:
             self.device = terminal.validation.get_terminal_info(cip)
 
             if not(terminal.validation.is_terminal_valid(self.device)):
@@ -143,7 +144,7 @@ class MEUtility(object):
         # Check for existing *.MER
         if not(self.overwrite) and (os.path.exists(file.path)): raise Exception(f'File {file.name} already exists.  Use kwarg overwrite=True to overwrite existing local file from the remote terminal.')
 
-        with comms.Driver(self.comms_path) as cip:
+        with comms.Driver(self.comms_path, self.driver) as cip:
             # Validate device at this communications path is a terminal of known version.
             self.device = terminal.validation.get_terminal_info(cip)
             if not(terminal.validation.is_terminal_valid(self.device)):
@@ -173,7 +174,7 @@ class MEUtility(object):
         # Create upload folder if it doesn't exist yet
         if not(os.path.exists(file_path)): os.makedirs(os.path.dirname(file_path))
 
-        with comms.Driver(self.comms_path) as cip:
+        with comms.Driver(self.comms_path, self.driver) as cip:
             # Validate device at this communications path is a terminal of known version.
             self.device = terminal.validation.get_terminal_info(cip)
             if not(terminal.validation.is_terminal_valid(self.device)):
