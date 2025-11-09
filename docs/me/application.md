@@ -86,3 +86,27 @@ Shortcut SHORTCUT_2_NAME Topology:
 │   │   │   │   │   │   │   ├── <port name="Backplane" address="0" portNumber="1" />
 │   │   │   │   │   │   │   │   └── <device name="PLC_2_NAME" NATPrivateAddress="" />
 ```
+
+### Recipe Files
+An ME application may contain RecipePlus *.rpp files in the RecipePlus folder inside the project.  Each is an OLE2 file with the following topology:
+```
+<RecipePlusName.rpp>
+├── DataSets
+│   ├── <Data Set x Name>
+│   ├── <Data Set y Name>
+│   ├── <Data Set z Name>
+├── TagSets
+│   ├── <Tag Set x Name>
+│   ├── <Tag Set y Name>
+│   ├── <Tag Set z Name>
+├── Config
+├── Decimals
+├── Ingredients
+├── Units
+```
+Each DataSet contains a list of values for that set.<br>
+Each TagSet contains a list of tag references for that set.<br>
+Config contains the global tag references for that RecipePlus file.<br>
+Decimals contains a list of the decimal precision for each ingredient.<br>
+Ingredients contains a list of the ingredient definitions (data type, min, max, name).<br>
+Units contains a list of the units (unit name, tag set, data set) that can be loaded.<br>
