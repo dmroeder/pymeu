@@ -849,8 +849,7 @@ class decompress_tests(unittest.TestCase):
         pprint.pprint(result)
         end = time.time()
         elapsed_time = end - start
-        print(elapsed_time)        
-
+        print(elapsed_time)
 
     def tearDown(self):
         pass
